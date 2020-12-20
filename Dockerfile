@@ -185,7 +185,7 @@ COPY docker-entrypoint-initdb.d/reenable_auth.sh /docker-entrypoint-initdb.d/
 
 # ------- Citus Data -------------------------------
 
-ENV CITUS_VERSION v9.5.1
+ENV CITUS_VERSION v8.3.2
 
 RUN apt-get -y install autoconf automake \
     && cd ${SRC_FOLDER} \
