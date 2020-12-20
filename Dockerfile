@@ -176,7 +176,7 @@ RUN apt-get -y install ca-certificates openssl cmake libldap-2.4 \
     && git clone https://github.com/timescale/timescaledb.git \
     && cd timescaledb \
     && git checkout ${TIMESCALEDB_VERSION} \
-    && ./bootstrap -DPROJECT_INSTALL_METHOD="docker" \
+    && ./bootstrap -DPROJECT_INSTALL_METHOD="docker" -DREGRESS_CHECKS=OFF \
     && cd build \
     && make install \
     && sed -r -i "s/[#]*\s*(shared_preload_libraries)\s*=\s*'(.*)'/\1 = 'timescaledb,\2'/;s/,'/'/" $AGHOME/share/postgresql/postgresql.conf.sample
