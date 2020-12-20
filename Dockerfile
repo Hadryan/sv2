@@ -110,13 +110,13 @@ RUN mkdir -p /home/agens/scripts
 ADD entrypoint.sh /home/agens/scripts
 RUN chmod +x /home/agens/scripts/entrypoint.sh
 
-# ------------- pg_cron ----------------------------
-
-RUN cd ${SRC_FOLDER} \
-    && git clone https://github.com/citusdata/pg_cron.git \
-    && cd pg_cron \
-    && make \
-    && make install
+## ------------- pg_cron ----------------------------
+#
+#RUN cd ${SRC_FOLDER} \
+#    && git clone https://github.com/citusdata/pg_cron.git \
+#    && cd pg_cron \
+#    && make \
+#    && make install
 
 ## ------------- PL/R -------------------------------
 #
