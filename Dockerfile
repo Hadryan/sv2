@@ -18,8 +18,8 @@ ENV AG_VERSION master
 
 RUN useradd -m -c "AgensGraph User" -U agens -p agens \
     && mkdir -p /home/agens/AgensGraph/data \
-    && mkdir -p /home/agens/.keras \
-    && touch /home/agens/.keras/keras.json \
+#$#    && mkdir -p /home/agens/.keras \
+#$#    && touch /home/agens/.keras/keras.json \
     && chown -R agens:agens /home/agens \
     && chmod -R 700 /home/agens
 
@@ -65,13 +65,13 @@ RUN apt-get -y install \
         python-pip \
         python-setuptools \
     && pip install \
-        sqlalchemy-fdw \
-        'scikit-learn[alldeps]' \
-        tensorflow \
-        pandas \
-        pillow \
-        h5py \
-        keras \
+#$#        sqlalchemy-fdw \
+#$#        'scikit-learn[alldeps]' \
+#$#        tensorflow \
+#$#        pandas \
+#$#        pillow \
+#$#        h5py \
+#$#        keras \
     && cd ${SRC_FOLDER} \
     && git clone https://github.com/bitnine-oss/agensgraph.git \
     && cd agensgraph \
