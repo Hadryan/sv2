@@ -96,15 +96,15 @@ RUN apt-get -y install \
     && tar zxvf pgcenter_0.6.6_Linux_x86_64.tar.gz \
     && rm pgcenter_0.6.6_Linux_x86_64.tar.gz \
     && mv pgcenter /usr/bin \
-    && pip install pgxnclient \
-    && pgxn install multicorn \
-    && pgxn install plv8 \
-    && pgxn install acl \
-    && pgxn install icu_ext \
+#$#    && pip install pgxnclient \
+#$#    && pgxn install multicorn \
+#$#    && pgxn install plv8 \
+#$#    && pgxn install acl \
+#$#    && pgxn install icu_ext \
     && sed -r -i "s/[#]*\s*(listen_addresses)\s*=\s*'(.*)'/\1 = '\*'/" $AGHOME/share/postgresql/postgresql.conf.sample \
+#$#    && echo '{"floatx":"float32","epsilon":1e-07,"backend": "tensorflow","image_data_format": "channels_last"}' > $AGHOME/../.keras/keras.json \
     && echo "host    all     all      0.0.0.0/0     md5" >> $AGHOME/share/postgresql/pg_hba.conf.sample \
-    && echo "host    all     all      ::1/128       md5" >> $AGHOME/share/postgresql/pg_hba.conf.sample \
-    && echo '{"floatx":"float32","epsilon":1e-07,"backend": "tensorflow","image_data_format": "channels_last"}' > $AGHOME/../.keras/keras.json
+    && echo "host    all     all      ::1/128       md5" >> $AGHOME/share/postgresql/pg_hba.conf.sample
 
 RUN mkdir -p /home/agens/scripts
 ADD entrypoint.sh /home/agens/scripts
