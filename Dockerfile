@@ -32,6 +32,7 @@ RUN apt-get -y install \
         libreadline-dev \
         zlib1g-dev \
         bison \
+        pkg-config \
         flex \
         uuid \
         openssl \
