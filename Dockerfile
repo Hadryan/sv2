@@ -64,7 +64,7 @@ RUN apt-get -y install \
         python-dev \
         python-pip \
         python-setuptools \
-    && pip install \
+#$#    && pip install \
 #$#        sqlalchemy-fdw \
 #$#        'scikit-learn[alldeps]' \
 #$#        tensorflow \
@@ -100,7 +100,7 @@ RUN apt-get -y install \
 #$#    && pgxn install multicorn \
 #$#    && pgxn install plv8 \
 #$#    && pgxn install acl \
-    && pgxn install icu_ext \
+#$#    && pgxn install icu_ext \
     && sed -r -i "s/[#]*\s*(listen_addresses)\s*=\s*'(.*)'/\1 = '\*'/" $AGHOME/share/postgresql/postgresql.conf.sample \
 #$#    && echo '{"floatx":"float32","epsilon":1e-07,"backend": "tensorflow","image_data_format": "channels_last"}' > $AGHOME/../.keras/keras.json \
     && echo "host    all     all      0.0.0.0/0     md5" >> $AGHOME/share/postgresql/pg_hba.conf.sample \
