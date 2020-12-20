@@ -1,10 +1,10 @@
-FROM ubuntu:bionic
+FROM debian:buster
 
 # ------- Preparation ------------------------------
 
 ENV DEBIAN_FRONTEND=noninteractive \
     SRC_FOLDER=/usr/local/src \
-    ZONE_INFO=America/Bogota
+    ZONE_INFO=UTC
 
 RUN apt-get update \
     && apt-get -y install build-essential git tar wget curl tzdata lsof net-tools htop atop glances iotop dstat sysstat procps tcpdump \
@@ -91,9 +91,9 @@ RUN apt-get -y install \
                    --with-icu \
     && make install-world \
     && cd ${SRC_FOLDER} \
-    && wget -c https://github.com/lesovsky/pgcenter/releases/download/v0.5.0/pgcenter.linux-amd64.tar.gz \
-    && tar zxvf pgcenter.linux-amd64.tar.gz \
-    && rm pgcenter.linux-amd64.tar.gz \
+    && wget -c https://github.com/lesovsky/pgcenter/releases/download/v0.6.6/pgcenter_0.6.6_Linux_x86_64.tar.gz \
+    && tar zxvf pgcenter_0.6.6_Linux_x86_64.tar.gz \
+    && rm pgcenter_0.6.6_Linux_x86_64.tar.gz \
     && mv pgcenter /usr/bin \
     && pip install pgxnclient \
     && pgxn install multicorn \
@@ -117,42 +117,42 @@ RUN cd ${SRC_FOLDER} \
     && make \
     && make install
 
-# ------------- PL/R -------------------------------
-
-# TODO install more r-cran-* packages
-RUN apt-get -y install r-base r-base-dev r-cran-date r-cran-matrixstats \
-    && cd ${SRC_FOLDER} \
-    && git clone https://github.com/postgres-plr/plr \
-    && cd plr \
-    && USE_PGXS=1 make \
-    && USE_PGXS=1 make install
-
-# -------- PL/Lua NG+JIT ---------------------------
-
-# TODO install luarocks + packages
-ENV LUA_VERSION 5.3
-
-RUN apt-get -y install lua${LUA_VERSION} liblua${LUA_VERSION}-dev \
-    && cd ${SRC_FOLDER} \
-    && git clone http://luajit.org/git/luajit-2.0.git \
-    && cd luajit-2.0 \
-    && git checkout v2.1 \
-    && make install \
-    && cd ${SRC_FOLDER} \
-    && git clone https://github.com/pllua/pllua-ng.git \
-    && cd pllua-ng \
-    && git checkout master \
-    && make \
-        LUA_INCDIR=/usr/include/lua${LUA_VERSION} \
-        LUAJIT=/usr/local/bin/luajit \
-        LUALIB="-llua${LUA_VERSION}" \
-        LUAC=luac${LUA_VERSION} \
-        LUA=lua${LUA_VERSION} \
-        install
+## ------------- PL/R -------------------------------
+#
+## TODO install more r-cran-* packages
+#RUN apt-get -y install r-base r-base-dev r-cran-date r-cran-matrixstats \
+#    && cd ${SRC_FOLDER} \
+#    && git clone https://github.com/postgres-plr/plr \
+#    && cd plr \
+#    && USE_PGXS=1 make \
+#    && USE_PGXS=1 make install
+#
+## -------- PL/Lua NG+JIT ---------------------------
+#
+## TODO install luarocks + packages
+#ENV LUA_VERSION 5.3
+#
+#RUN apt-get -y install lua${LUA_VERSION} liblua${LUA_VERSION}-dev \
+#    && cd ${SRC_FOLDER} \
+#    && git clone http://luajit.org/git/luajit-2.0.git \
+#    && cd luajit-2.0 \
+#    && git checkout v2.1 \
+#    && make install \
+#    && cd ${SRC_FOLDER} \
+#    && git clone https://github.com/pllua/pllua-ng.git \
+#    && cd pllua-ng \
+#    && git checkout master \
+#    && make \
+#        LUA_INCDIR=/usr/include/lua${LUA_VERSION} \
+#        LUAJIT=/usr/local/bin/luajit \
+#        LUALIB="-llua${LUA_VERSION}" \
+#        LUAC=luac${LUA_VERSION} \
+#        LUA=lua${LUA_VERSION} \
+#        install
 
 # --------- PostGIS --------------------------------
 
-ENV POSTGIS_VERSION 2.5.0
+ENV POSTGIS_VERSION 2.5.5
 
 RUN apt-get -y install libxml2-dev libgeos-dev libgdal-dev libproj-dev \
     && cd ${SRC_FOLDER} \
@@ -168,7 +168,7 @@ COPY ./update-postgis.sh /usr/local/bin
 
 # ------- TimescaleDB -----------------------------
 
-ENV TIMESCALEDB_VERSION 0.12.1
+ENV TIMESCALEDB_VERSION 1.7.4
 
 RUN apt-get -y install ca-certificates openssl cmake libldap-2.4 \
     && cd ${SRC_FOLDER} \
@@ -184,7 +184,7 @@ COPY docker-entrypoint-initdb.d/reenable_auth.sh /docker-entrypoint-initdb.d/
 
 # ------- Citus Data -------------------------------
 
-ENV CITUS_VERSION v7.5.1
+ENV CITUS_VERSION v9.5.1
 
 RUN apt-get -y install autoconf automake \
     && cd ${SRC_FOLDER} \
@@ -195,49 +195,49 @@ RUN apt-get -y install autoconf automake \
     && make install \
     && sed -r -i "s/[#]*\s*(shared_preload_libraries)\s*=\s*'(.*)'/\1 = 'citus,\2'/;s/,'/'/" $AGHOME/share/postgresql/postgresql.conf.sample
 
-# ------- ZomboDB ---------------------------------
-
-RUN cd ${SRC_FOLDER} \
-    && git clone https://github.com/zombodb/zombodb.git \
-    && cd zombodb \
-    && make clean install
-
-# ------- EdgeDB ----------------------------------
-
-ENV EDB_VERSION master
-
-RUN apt-get -y install \
-        tk-dev \
-        libbz2-dev \
-        libssl-dev \
-        libpng-dev \
-        libsqlite3-dev \
-        libfreetype6-dev \
-        python3.6 \
-        python3.6-dev \
-        python3-pip \
-        python3-distutils \
-        python3-setuptools \
-    && pip3 install \
-        click \
-        promise \
-        asyncpg \
-        Parsing \
-        pygments \
-        setproctitle \
-        graphql-core \
-        'typing_inspect~=0.3.1' \
-        'prompt_toolkit>=1.0.15,<2.0.0' \
-    && cd ${SRC_FOLDER} \
-    && git clone https://github.com/edgedb/edgedb.git \
-    && cd edgedb \
-    && git checkout ${EDB_VERSION} \
-    && rm -rf postgres \
-    && python3 setup.py install \
-    && cd ext \
-    && make \
-    && make install \
-    && chown -R agens /usr/local/lib/python3.*/dist-packages/edgedb_server-*.egg
+## ------- ZomboDB ---------------------------------
+#
+#RUN cd ${SRC_FOLDER} \
+#    && git clone https://github.com/zombodb/zombodb.git \
+#    && cd zombodb \
+#    && make clean install
+#
+## ------- EdgeDB ----------------------------------
+#
+#ENV EDB_VERSION master
+#
+#RUN apt-get -y install \
+#        tk-dev \
+#        libbz2-dev \
+#        libssl-dev \
+#        libpng-dev \
+#        libsqlite3-dev \
+#        libfreetype6-dev \
+#        python3.6 \
+#        python3.6-dev \
+#        python3-pip \
+#        python3-distutils \
+#        python3-setuptools \
+#    && pip3 install \
+#        click \
+#        promise \
+#        asyncpg \
+#        Parsing \
+#        pygments \
+#        setproctitle \
+#        graphql-core \
+#        'typing_inspect~=0.3.1' \
+#        'prompt_toolkit>=1.0.15,<2.0.0' \
+#    && cd ${SRC_FOLDER} \
+#    && git clone https://github.com/edgedb/edgedb.git \
+#    && cd edgedb \
+#    && git checkout ${EDB_VERSION} \
+#    && rm -rf postgres \
+#    && python3 setup.py install \
+#    && cd ext \
+#    && make \
+#    && make install \
+#    && chown -R agens /usr/local/lib/python3.*/dist-packages/edgedb_server-*.egg
 
 # --------- Clean-up -------------------------------
 
